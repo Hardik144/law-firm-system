@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  role      Role
+  createdAt DateTime  @default(now())
+  casesCreated Case[] @relation("CasesCreated")
+  judgedCases Case[] @relation("CaseJudge")
+  assignedCases CaseAssignment[]
+  documents   Document[] @relation("DocumentsUploaded")
+  accessLogs  AccessLog[]
+}
+
+model Case {
+  id          Int              @id @default(autoincrement())
+  caseNumber  String           @unique
+  title       String
+  description String
+  status      String
+  judge       User?            @relation("CaseJudge", fields: [judgeId], references: [id])
+  judgeId     Int?
+  createdBy   User             @relation("CasesCreated", fields: [createdById], references: [id])
+  createdById Int
+  createdAt   DateTime         @default(now())
+  assignments CaseAssignment[]
+  documents   Document[]
+  accessLogs  AccessLog[]
+}
+
+model CaseAssignment {
+  id     Int  @id @default(autoincrement())
+  case   Case @relation(fields: [caseId], references: [id])
+  caseId Int
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+  role   Role
+}
+
+model Document {
+  id         Int      @id @default(autoincrement())
+  case       Case     @relation(fields: [caseId], references: [id])
+  caseId     Int
+  fileName   String
+  filePath   String
+  version    Int      @default(1)
+  uploadedBy User     @relation("DocumentsUploaded", fields: [uploadedById], references: [id])
+  uploadedById Int
+  uploadedAt DateTime @default(now())
+  accessLogs AccessLog[]
+}
+
+model AccessLog {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  case       Case?    @relation(fields: [caseId], references: [id])
+  caseId     Int?
+  document   Document? @relation(fields: [documentId], references: [id])
+  documentId Int?
+  action     String
+  timestamp  DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  JUDGE
+  LAWYER
+  CLERK
+}
+

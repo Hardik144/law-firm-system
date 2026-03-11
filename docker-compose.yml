@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: lawfirm-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: law_firm_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lawfirm-backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./backend/uploads:/usr/src/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: lawfirm-frontend
+    environment:
+      # IMPORTANT: This value is used by the browser, so it must be host-reachable.
+      - VITE_API_BASE_URL=http://localhost:4000/api
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    container_name: lawfirm-prometheus
+    volumes:
+      - ./devops/docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    depends_on:
+      - backend
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: lawfirm-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./devops/docker/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+
+volumes:
+  pgdata:
+  grafana_data:
+

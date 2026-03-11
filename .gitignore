@@ -1,0 +1,15 @@
+**/node_modules/
+**/dist/
+**/.DS_Store
+
+# Env files (do not commit secrets)
+**/.env
+**/.env.*
+!**/.env.example
+
+# Uploads and runtime volumes
+backend/uploads/
+
+# Prisma local artifacts
+backend/prisma/dev.db
+

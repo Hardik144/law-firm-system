@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: lawfirm/backend:latest
+          env:
+            - name: DATABASE_URL
+              value: postgresql://postgres:postgres@postgres:5432/law_firm_db?schema=public
+            - name: JWT_SECRET
+              value: supersecretjwtkey_change_me
+            - name: PORT
+              value: "4000"
+            - name: UPLOAD_DIR
+              value: /usr/src/app/uploads
+          ports:
+            - containerPort: 4000

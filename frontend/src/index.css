@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light, professional legal dashboard defaults */
+html, body {
+  height: 100%;
+}
+
