@@ -32,7 +32,8 @@ export const uploadDocument = async (req, res) => {
         fileName: file.originalname,
         filePath: file.path,
         version: existingCount + 1,
-        uploadedById: req.user.id
+        uploadedById: req.user.id,
+        type: documentType || null
       }
     });
 

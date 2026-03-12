@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../services/api";
 
 export default function UploadDocument() {
@@ -46,6 +47,16 @@ export default function UploadDocument() {
         <div className="text-lg font-semibold text-slate-900">Upload Document</div>
         <div className="text-sm text-slate-500">Attach documents to a case with auditing enabled.</div>
       </div>
+
+      {!cases.length && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          No cases are available yet. Please{" "}
+          <Link to="/cases" className="underline font-medium">
+            create a case
+          </Link>{" "}
+          before uploading documents.
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="bg-white border rounded-lg p-4 space-y-4 max-w-2xl">
         {status && (

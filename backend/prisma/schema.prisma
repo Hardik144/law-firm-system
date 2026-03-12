@@ -19,6 +19,8 @@ model User {
   assignedCases CaseAssignment[]
   documents   Document[] @relation("DocumentsUploaded")
   accessLogs  AccessLog[]
+  comments    CaseComment[]
+  tasks       CaseTask[] @relation("TaskAssignee")
 }
 
 model Case {
@@ -27,6 +29,7 @@ model Case {
   title       String
   description String
   status      String
+  isRestricted Boolean         @default(false)
   judge       User?            @relation("CaseJudge", fields: [judgeId], references: [id])
   judgeId     Int?
   createdBy   User             @relation("CasesCreated", fields: [createdById], references: [id])
@@ -35,6 +38,8 @@ model Case {
   assignments CaseAssignment[]
   documents   Document[]
   accessLogs  AccessLog[]
+  comments    CaseComment[]
+  tasks       CaseTask[]
 }
 
 model CaseAssignment {
@@ -53,6 +58,8 @@ model Document {
   fileName   String
   filePath   String
   version    Int      @default(1)
+  type       String?
+  tags       String?
   uploadedBy User     @relation("DocumentsUploaded", fields: [uploadedById], references: [id])
   uploadedById Int
   uploadedAt DateTime @default(now())
@@ -69,6 +76,29 @@ model AccessLog {
   documentId Int?
   action     String
   timestamp  DateTime @default(now())
+}
+
+model CaseComment {
+  id        Int      @id @default(autoincrement())
+  case      Case     @relation(fields: [caseId], references: [id])
+  caseId    Int
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model CaseTask {
+  id          Int      @id @default(autoincrement())
+  case        Case     @relation(fields: [caseId], references: [id])
+  caseId      Int
+  title       String
+  description String?
+  assignee    User?    @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  assigneeId  Int?
+  dueDate     DateTime?
+  status      String   @default("Todo") // Todo, In Progress, Done
+  createdAt   DateTime @default(now())
 }
 
 enum Role {

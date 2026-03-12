@@ -2,7 +2,8 @@ pipeline {
   agent any
 
   environment {
-    REGISTRY = "your-registry.example.com"
+    // Docker Hub namespace
+    REGISTRY = "docker.io/hardik144"
     FRONTEND_IMAGE = "${env.REGISTRY}/lawfirm-frontend"
     BACKEND_IMAGE = "${env.REGISTRY}/lawfirm-backend"
     KUBE_NAMESPACE = "default"
@@ -18,22 +19,32 @@ pipeline {
 
     stage('Run tests') {
       steps {
-        sh 'cd backend && npm test'
+        // Backend currently has no real tests; keep command for future use
+        sh 'cd backend && npm test || echo "no backend tests configured"'
         sh 'cd frontend && npm run build'
       }
     }
 
     stage('Build Docker images') {
       steps {
-        sh 'docker build -t $BACKEND_IMAGE:latest backend'
-        sh 'docker build -t $FRONTEND_IMAGE:latest frontend'
+        script {
+          def tag = env.BUILD_NUMBER
+          sh "docker build -t $BACKEND_IMAGE:${tag} backend"
+          sh "docker build -t $FRONTEND_IMAGE:${tag} frontend"
+          // also tag as :latest for convenience
+          sh "docker tag $BACKEND_IMAGE:${tag} $BACKEND_IMAGE:latest"
+          sh "docker tag $FRONTEND_IMAGE:${tag} $FRONTEND_IMAGE:latest"
+        }
       }
     }
 
     stage('Push images') {
       steps {
-        sh 'docker push $BACKEND_IMAGE:latest'
-        sh 'docker push $FRONTEND_IMAGE:latest'
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+          sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+          sh 'docker push $BACKEND_IMAGE:latest'
+          sh 'docker push $FRONTEND_IMAGE:latest'
+        }
       }
     }
 

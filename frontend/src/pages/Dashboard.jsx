@@ -20,15 +20,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     const load = async () => {
-      const [casesRes] = await Promise.all([api.get("/cases")]);
-      const cases = casesRes.data || [];
-      const active = cases.filter((c) => (c.status || "").toLowerCase() === "active").length;
-      const pending = cases.filter((c) => (c.status || "").toLowerCase() === "pending").length;
+      const res = await api.get("/reports/cases-summary");
+      const data = res.data || {};
+      const byStatus = data.byStatus || {};
       setStats((s) => ({
         ...s,
-        totalCases: cases.length,
-        activeCases: active,
-        pendingCases: pending
+        totalCases: data.totalCases || 0,
+        activeCases: byStatus.Active || 0,
+        pendingCases: byStatus.Pending || 0
       }));
     };
     load().catch(() => {});

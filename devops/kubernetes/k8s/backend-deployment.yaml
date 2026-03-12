@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: lawfirm/backend:latest
+          # Image built and pushed by Jenkins pipeline
+          image: docker.io/hardik144/lawfirm-backend:latest
           env:
             - name: DATABASE_URL
               value: postgresql://postgres:postgres@postgres:5432/law_firm_db?schema=public

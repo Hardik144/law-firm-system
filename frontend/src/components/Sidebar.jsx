@@ -22,9 +22,14 @@ export default function Sidebar({ user }) {
             Upload Document
           </NavLink>
           {user?.role === "ADMIN" && (
-            <NavLink to="/users" className={linkClass}>
-              Users
-            </NavLink>
+            <>
+              <NavLink to="/users" className={linkClass}>
+                Users
+              </NavLink>
+              <NavLink to="/audit" className={linkClass}>
+                Audit Logs
+              </NavLink>
+            </>
           )}
         </nav>
       </div>

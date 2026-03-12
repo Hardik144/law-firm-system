@@ -9,6 +9,7 @@ import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import caseRoutes from "./routes/caseRoutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
+import caseExtrasRoutes from "./routes/caseExtrasRoutes.js";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/cases", caseRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api", caseExtrasRoutes);
 
 // Metrics endpoint
 app.get("/metrics", async (req, res) => {

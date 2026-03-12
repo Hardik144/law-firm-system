@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: lawfirm/frontend:latest
+          # Image built and pushed by Jenkins pipeline
+          image: docker.io/hardik144/lawfirm-frontend:latest
           env:
             - name: VITE_API_BASE_URL
               value: http://backend:4000/api

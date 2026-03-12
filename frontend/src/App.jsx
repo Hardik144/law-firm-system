@@ -8,6 +8,7 @@ import Cases from "./pages/Cases.jsx";
 import CaseDetails from "./pages/CaseDetails.jsx";
 import UploadDocument from "./pages/UploadDocument.jsx";
 import Users from "./pages/Users.jsx";
+import AuditLogs from "./pages/AuditLogs.jsx";
 
 function getStoredUser() {
   try {
@@ -83,6 +84,14 @@ export default function App() {
           element={
             <RequireAdmin user={user}>
               <Users />
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="audit"
+          element={
+            <RequireAdmin user={user}>
+              <AuditLogs />
             </RequireAdmin>
           }
         />
