@@ -1,20 +1,16 @@
 pipeline {
   agent any
-
   environment {
     REGISTRY = "docker.io/hardik144"
     FRONTEND_IMAGE = "${env.REGISTRY}/lawfirm-frontend"
     BACKEND_IMAGE = "${env.REGISTRY}/lawfirm-backend"
   }
-
   stages {
-
     stage('Checkout Code') {
       steps {
         checkout scm
       }
     }
-
     stage('Build Docker Images') {
       steps {
         sh '''
@@ -23,7 +19,6 @@ pipeline {
         '''
       }
     }
-
     stage('Push Images to Docker Hub') {
       steps {
         withCredentials([usernamePassword(
@@ -39,14 +34,14 @@ pipeline {
         }
       }
     }
-
     stage('Deploy to Kubernetes') {
       steps {
-        sh '''
-        kubectl apply -f devops/kubernetes/k8s/
-        '''
+        withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+          sh '''
+          kubectl apply -f devops/kubernetes/k8s/
+          '''
+        }
       }
     }
-
   }
 }
